@@ -678,6 +678,18 @@ p {
   text-align: center;
 }
 
+.form-error {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  background: rgba(224, 122, 106, 0.12);
+  border: 1px solid rgba(224, 122, 106, 0.4);
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 .form-success {
   padding: 1rem;
   border-radius: 10px;
