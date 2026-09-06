@@ -12,13 +12,13 @@ npm run dev
 npm run build  (outputs dist/)
 npm run preview
 
-## Demo form (live FormSubmit)
+## Demo form (native FormSubmit POST)
 
 Fields: name, phone, lot, city.
 Client-side validation (Israeli phone pattern).
-Live endpoint in src/main.js: DEMO_ENDPOINT posts to FormSubmit AJAX for gili@webxp.co.il.
-POSTs JSON: name, phone, lot, city, source, submittedAt, _subject, _template, _captcha.
-Success UI only after HTTP OK + FormSubmit success. Failures show #form-error and re-enable the button.
+Native HTML POST to FormSubmit (no fetch/AJAX) — avoids browser CORS on GitHub Pages.
+Form action posts name/phone/lot/city plus hidden _subject, _template=table, _captcha=false, _next=?sent=1#demo, source=auto360-landing.
+JS validates only; if valid, native submit. On return with sent=1, shows success UI and strips query via history.replaceState.
 First-time FormSubmit may require Activate / Confirm on gili@webxp.co.il.
 
 ## Honesty
@@ -37,4 +37,4 @@ Publish dist/ (or docs/ for GitHub Pages) to any static host (Netlify, Vercel, C
 
 דף נחיתה RTL. Vite + vanilla.
 Form: שם / טלפון / מגרש / עיר.
-Live FormSubmit to gili@webxp.co.il (DEMO_ENDPOINT in src/main.js).
+Native FormSubmit POST to gili@webxp.co.il (no browser fetch — avoids CORS on GitHub Pages).

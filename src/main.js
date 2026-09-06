@@ -26,8 +26,6 @@ const form = document.getElementById('demo-form');
 const success = document.getElementById('form-success');
 const formError = document.getElementById('form-error');
 
-const DEMO_ENDPOINT = 'https://formsubmit.co/ajax/gili@webxp.co.il';
-
 const IL_PHONE =
   /^(?:(?:\+972|972|0)(?:-)?(?:[23489]|5[0-9]|7[2-9])(?:-)?\d{7})$/;
 
@@ -111,29 +109,36 @@ function validate() {
   });
 });
 
-function isFormSubmitSuccess(payload) {
-  if (!payload || typeof payload !== 'object') return false;
-  return payload.success === true || payload.success === 'true';
+function showSuccessUi() {
+  form?.classList.add('is-success');
+  if (success) success.hidden = false;
+  setFormError('');
 }
 
-function looksLikeActivation(payload, rawText) {
-  const msg = [
-    payload?.message,
-    payload?.error,
-    typeof rawText === 'string' ? rawText : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-  return (
-    msg.includes('activate') ||
-    msg.includes('confirm your email') ||
-    msg.includes('check your email') ||
-    msg.includes('activation')
-  );
+function handleSentRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  const sentFlag = params.get('sent') === '1' || params.has('sent');
+  const thankFlag =
+    /thank/i.test(window.location.search) ||
+    /thank/i.test(window.location.hash);
+  if (!sentFlag && !thankFlag) return;
+
+  showSuccessUi();
+  const url = new URL(window.location.href);
+  url.searchParams.delete('sent');
+  url.searchParams.delete('thank');
+  const qs = url.searchParams.toString();
+  const clean = url.pathname + (qs ? `?${qs}` : '') + (url.hash || '#demo');
+  history.replaceState(null, '', clean);
 }
 
-form?.addEventListener('submit', async (event) => {
+handleSentRedirect();
+
+let allowNativeSubmit = false;
+
+form?.addEventListener('submit', (event) => {
+  if (allowNativeSubmit) return;
+
   event.preventDefault();
   setFormError('');
   if (!validate()) {
@@ -142,67 +147,6 @@ form?.addEventListener('submit', async (event) => {
     return;
   }
 
-  const submitBtn = form.querySelector('button[type="submit"]');
-  const originalLabel = submitBtn?.textContent ?? '';
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'שולחים…';
-  }
-
-  const data = Object.fromEntries(new FormData(form).entries());
-
-  try {
-    const response = await fetch(DEMO_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        name: data.name,
-        phone: data.phone,
-        lot: data.lot,
-        city: data.city,
-        source: 'auto360-landing',
-        submittedAt: new Date().toISOString(),
-        _subject: 'Auto360 — בקשת דמו 15 דקות',
-        _template: 'table',
-        _captcha: 'false',
-      }),
-    });
-
-    const rawText = await response.text();
-    let payload = null;
-    try {
-      payload = rawText ? JSON.parse(rawText) : null;
-    } catch {
-      payload = null;
-    }
-
-    if (response.ok && isFormSubmitSuccess(payload)) {
-      form.classList.add('is-success');
-      if (success) success.hidden = false;
-      return;
-    }
-
-    if (looksLikeActivation(payload, rawText)) {
-      setFormError('נדרשת הפעלה ראשונה: בדקו את תיבת הדוא״ל של gili@webxp.co.il ולחצו Activate / Confirm באימייל מ־FormSubmit, ואז נסו שוב.');
-    } else {
-      const detail =
-        (payload && (payload.message || payload.error)) ||
-        (!response.ok ? `שגיאת שרת (${response.status})` : null);
-      setFormError(
-        detail
-          ? `שליחת הבקשה נכשלה: ${detail}`
-          : 'שליחת הבקשה נכשלה. נסו שוב בעוד רגע.',
-      );
-    }
-  } catch {
-    setFormError('שגיאת רשת — בדקו חיבור ונסו שוב.');
-  }
-
-  if (submitBtn) {
-    submitBtn.disabled = false;
-    submitBtn.textContent = originalLabel;
-  }
+  allowNativeSubmit = true;
+  form.submit();
 });
