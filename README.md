@@ -1,32 +1,40 @@
 # Auto360 Landing
 
-Hebrew RTL Vite landing for Auto360 (approved marketing content v2).
+Hebrew RTL Vite landing for Auto360.
+
+npm install
+npm run build
 
 ## Setup
 
-```bash
 npm install
 npm run dev
-npm run build   # outputs dist/
+npm run build  (outputs dist/)
 npm run preview
-```
 
-## Demo form stub
+## Demo form (live FormSubmit)
 
-Fields: שם / טלפון / מגרש / עיר.
+Fields: name, phone, lot, city.
 Client-side validation (Israeli phone pattern).
-Stub endpoint: `STUB_ENDPOINT` in `src/main.js` — replace with CRM/webhook for production.
-On static hosts, network errors are ignored; success UI shows after validation.
+Live endpoint in src/main.js: DEMO_ENDPOINT posts to FormSubmit AJAX for gili@webxp.co.il.
+POSTs JSON: name, phone, lot, city, source, submittedAt, _subject, _template, _captcha.
+Success UI only after HTTP OK + FormSubmit success. Failures show #form-error and re-enable the button.
+First-time FormSubmit may require Activate / Confirm on gili@webxp.co.il.
 
 ## Honesty
 
-Full lead funnel (R5) is in development — short note on page only, not sold as live.
+Full lead funnel (R5) is in development. Short tasteful note on page only — not sold as live.
+
+## Design
+
+Premium industrial automotive dark theme. Heebo + Rubik. Mobile-first RTL. Accessible.
 
 ## Deploy
 
-Publish `dist/` to any static host (Netlify, Vercel, Cloudflare Pages).
+Publish dist/ (or docs/ for GitHub Pages) to any static host (Netlify, Vercel, Cloudflare Pages, S3).
 
 ## עברית
 
-דף נחיתה RTL ל-Auto360. Vite + vanilla HTML/CSS/JS.
-תוכן מאושר v2 (דני/נועה). Form: שם · טלפון · מגרש · עיר.
+דף נחיתה RTL. Vite + vanilla.
+Form: שם / טלפון / מגרש / עיר.
+Live FormSubmit to gili@webxp.co.il (DEMO_ENDPOINT in src/main.js).
